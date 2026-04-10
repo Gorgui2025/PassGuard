@@ -199,7 +199,8 @@ export default function LandingPage() {
       <div style={{ maxWidth:1140, margin:'0 auto', display:'flex', alignItems:'center', justifyContent:'space-between' }}>
 
         {/* Logo */}
-        <div style={{ display:'flex', alignItems:'center', gap:10 }}>
+        <div onClick={() => navigate('/')}
+          style={{ display:'flex', alignItems:'center', gap:10, cursor:'pointer' }}>
           <VaultLogo size={36} gradient={true}/>
           <span style={{ fontSize:18, fontWeight:900, background:GO,
             WebkitBackgroundClip:'text', WebkitTextFillColor:'transparent' }}>PassGuard</span>
