@@ -98,7 +98,7 @@ const PLANS = [
 ]
 
 const PAYMENTS = [
-  { name:'Wave',         color:'#2563eb', bg:'#eff6ff', logo:<img src="/image/wave.jpeg" alt="Wave" style={{ width:28, height:28, borderRadius:6, objectFit:'cover' }}/>, available:true  },
+  { name:'Wave',         color:'#2563eb', bg:'#eff6ff', logo:null, available:true  },
   { name:'Orange Money', color:'#ea580c', bg:'#fff7ed', logo:'🟠', available:true  },
   { name:'Free Money',   color:'#dc2626', bg:'#fef2f2', logo:'🔴', available:false },
   { name:'MTN MoMo',     color:'#ca8a04', bg:'#fefce8', logo:'📱', available:false },
@@ -588,26 +588,47 @@ export default function LandingPage() {
       <div style={{ display:'grid',
         gridTemplateColumns: isMobile ? 'repeat(2,1fr)' : 'repeat(3,1fr)',
         gap:14, maxWidth:640, margin:'0 auto' }}>
-        {PAYMENTS.map(({ name, color, bg, logo, available }) => (
-          <div key={name} className={available ? 'lp-hover-lift' : ''}
-            style={{ padding:'18px 16px', borderRadius:18, position:'relative',
-              background: available ? bg : '#f8fafc',
-              border: available ? `1px solid ${color}20` : '1px solid #e2e8f0',
-              textAlign:'center', boxShadow: available ? '0 2px 8px rgba(0,0,0,0.04)' : 'none',
-              opacity: available ? 1 : 0.55 }}>
-            <div style={{ fontSize:28, marginBottom:10,
-              filter: available ? 'none' : 'grayscale(1)' }}>{logo}</div>
-            <div style={{ fontSize:14, fontWeight:800,
-              color: available ? color : '#94a3b8' }}>{name}</div>
-            {!available && (
-              <div style={{ marginTop:6, display:'inline-block', fontSize:10, fontWeight:800,
-                color:'#94a3b8', background:'#e2e8f0', borderRadius:999,
-                padding:'2px 8px', letterSpacing:0.5 }}>
-                Bientôt
+        {PAYMENTS.map(({ name, color, bg, logo, available }) => {
+          /* ── Carte spéciale Wave : image pleine ── */
+          if (name === 'Wave') return (
+            <div key={name} className="lp-hover-lift"
+              style={{ borderRadius:18, overflow:'hidden', position:'relative',
+                height:160, boxShadow:'0 4px 20px rgba(21,112,239,0.25)',
+                border:'1px solid #bfdbfe' }}>
+              <img src="/image/wave.jpeg" alt="Wave"
+                style={{ width:'100%', height:'100%', objectFit:'cover', display:'block' }}/>
+              <div style={{ position:'absolute', bottom:0, left:0, right:0,
+                padding:'10px 14px',
+                background:'linear-gradient(to top, rgba(21,112,239,0.85), transparent)',
+                textAlign:'center' }}>
+                <span style={{ fontSize:15, fontWeight:900, color:'white',
+                  textShadow:'0 1px 4px rgba(0,0,0,0.3)' }}>Wave</span>
               </div>
-            )}
-          </div>
-        ))}
+            </div>
+          )
+
+          /* ── Cartes standard ── */
+          return (
+            <div key={name} className={available ? 'lp-hover-lift' : ''}
+              style={{ padding:'18px 16px', borderRadius:18, position:'relative',
+                background: available ? bg : '#f8fafc',
+                border: available ? `1px solid ${color}20` : '1px solid #e2e8f0',
+                textAlign:'center', boxShadow: available ? '0 2px 8px rgba(0,0,0,0.04)' : 'none',
+                opacity: available ? 1 : 0.55 }}>
+              <div style={{ fontSize:28, marginBottom:10,
+                filter: available ? 'none' : 'grayscale(1)' }}>{logo}</div>
+              <div style={{ fontSize:14, fontWeight:800,
+                color: available ? color : '#94a3b8' }}>{name}</div>
+              {!available && (
+                <div style={{ marginTop:6, display:'inline-block', fontSize:10, fontWeight:800,
+                  color:'#94a3b8', background:'#e2e8f0', borderRadius:999,
+                  padding:'2px 8px', letterSpacing:0.5 }}>
+                  Bientôt
+                </div>
+              )}
+            </div>
+          )
+        })}
       </div>
     </Section>
   )
