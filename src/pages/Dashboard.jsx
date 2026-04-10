@@ -128,9 +128,16 @@ export default function Dashboard() {
   const fetchPw = useCallback(async () => {
     const { data } = await supabase.from('passwords').select('*')
       .eq('user_id', user.id).order('created_at', { ascending: false })
-    if (data) setPasswords(data)
+    if (data) {
+      const prev = passwords.length
+      setPasswords(data)
+      /* Toast d'alerte à 8/10 (seulement quand on vient d'ajouter une entrée) */
+      if (data.length === FREE_LIMIT - 2 && prev < FREE_LIMIT - 2) {
+        addToast(`Attention — il ne vous reste que 2 entrées disponibles. Passez au plan Pro pour un coffre illimité.`, 'info')
+      }
+    }
     setLoadingPw(false)
-  }, [user])
+  }, [user, passwords.length, addToast])
 
   useEffect(() => {
     fetchPw()
@@ -372,6 +379,42 @@ export default function Dashboard() {
               {online ? 'Synchronisé' : 'Hors ligne'}
             </span>
           </div>
+
+          {/* ── Barre de progression entrées ── */}
+          {(() => {
+            const count   = passwords.length
+            const pct     = Math.min((count / FREE_LIMIT) * 100, 100)
+            const isFull  = count >= FREE_LIMIT
+            const isWarn  = count >= FREE_LIMIT - 2 && !isFull
+            const barColor = isFull ? '#ef4444' : isWarn ? '#f59e0b' : '#22c55e'
+            return (
+              <div style={{ margin:'0 12px 10px', padding:'12px 14px', borderRadius:12,
+                background: isFull ? '#fef2f2' : isWarn ? '#fffbeb' : '#f8fafc',
+                border: `1px solid ${isFull ? '#fecaca' : isWarn ? '#fde68a' : '#e2e8f0'}` }}>
+                <div style={{ display:'flex', justifyContent:'space-between', marginBottom:6 }}>
+                  <span style={{ fontSize:11, fontWeight:800, color:'#475569' }}>Entrées</span>
+                  <span style={{ fontSize:11, fontWeight:900,
+                    color: isFull ? '#dc2626' : isWarn ? '#d97706' : '#334155' }}>
+                    {count} / {FREE_LIMIT}
+                  </span>
+                </div>
+                <div style={{ height:6, borderRadius:999, background:'#e2e8f0', overflow:'hidden' }}>
+                  <div style={{ height:'100%', borderRadius:999, transition:'width .4s ease',
+                    width:`${pct}%`, background: barColor }}/>
+                </div>
+                {isFull && (
+                  <div style={{ fontSize:10, color:'#dc2626', fontWeight:700, marginTop:5 }}>
+                    Limite atteinte — passez au Pro
+                  </div>
+                )}
+                {isWarn && (
+                  <div style={{ fontSize:10, color:'#d97706', fontWeight:700, marginTop:5 }}>
+                    Plus que {FREE_LIMIT - count} entrée{FREE_LIMIT - count > 1 ? 's' : ''} disponible{FREE_LIMIT - count > 1 ? 's' : ''}
+                  </div>
+                )}
+              </div>
+            )
+          })()}
         </>
       )}
 
@@ -543,6 +586,72 @@ export default function Dashboard() {
           <div style={{ flex:1 }}>
             <span style={{ fontSize:13, fontWeight:700, color:'#dc2626' }}>Hors ligne </span>
             <span style={{ fontSize:12, color:'#f87171' }}>— vos données sont affichées depuis le cache. Les modifications seront synchronisées au retour de la connexion.</span>
+          </div>
+        </div>
+      )}
+
+      {/* ── Bannière approche limite (8-9/10) ── */}
+      {passwords.length >= FREE_LIMIT - 2 && passwords.length < FREE_LIMIT && (
+        <div style={{ display:'flex', alignItems:'center', gap:12, padding:'14px 16px',
+          borderRadius:14, background:'linear-gradient(135deg,#fffbeb,#fef3c7)',
+          border:'1.5px solid #fde68a', marginBottom:16, animation:'pgFadeIn .2s ease' }}>
+          <AlertTriangle size={16} color="#d97706" style={{ flexShrink:0 }}/>
+          <div style={{ flex:1 }}>
+            <span style={{ fontSize:13, fontWeight:800, color:'#92400e' }}>
+              Plus que {FREE_LIMIT - passwords.length} entrée{FREE_LIMIT - passwords.length > 1 ? 's' : ''} disponible{FREE_LIMIT - passwords.length > 1 ? 's' : ''} !{' '}
+            </span>
+            <span style={{ fontSize:12, color:'#b45309' }}>
+              Passez au plan Pro pour un coffre illimité.
+            </span>
+          </div>
+          <button onClick={() => setShowUpgrade(true)}
+            style={{ padding:'7px 14px', borderRadius:10, border:'none',
+              background:'linear-gradient(135deg,#f59e0b,#d97706)',
+              color:'white', fontWeight:800, fontSize:12, cursor:'pointer',
+              whiteSpace:'nowrap', boxShadow:'0 4px 12px rgba(217,119,6,0.35)' }}>
+            Passer Pro
+          </button>
+        </div>
+      )}
+
+      {/* ── Bannière limite atteinte (10/10) ── */}
+      {passwords.length >= FREE_LIMIT && (
+        <div style={{ borderRadius:16, overflow:'hidden', marginBottom:20,
+          boxShadow:'0 4px 20px rgba(239,68,68,0.15)', animation:'pgFadeIn .2s ease' }}>
+          <div style={{ background:'linear-gradient(135deg,#ef4444,#dc2626)',
+            padding:'16px 20px', display:'flex', alignItems:'center', gap:12 }}>
+            <Lock size={18} color="white" style={{ flexShrink:0 }}/>
+            <div style={{ flex:1 }}>
+              <div style={{ fontSize:14, fontWeight:900, color:'white' }}>
+                Limite de {FREE_LIMIT} entrées atteinte
+              </div>
+              <div style={{ fontSize:12, color:'rgba(255,255,255,0.85)', marginTop:2 }}>
+                Vous ne pouvez plus ajouter de mots de passe sur le plan gratuit.
+              </div>
+            </div>
+          </div>
+          <div style={{ background:'white', padding:'16px 20px',
+            border:'1.5px solid #fecaca', borderTop:'none' }}>
+            <div style={{ display:'grid', gridTemplateColumns:'repeat(3,1fr)', gap:10, marginBottom:14 }}>
+              {[
+                { icon:'∞', label:'Entrées illimitées' },
+                { icon:'📱', label:'Multi-appareils' },
+                { icon:'📤', label:'Export sécurisé' },
+              ].map(({ icon, label }) => (
+                <div key={label} style={{ textAlign:'center', padding:'10px 8px',
+                  borderRadius:12, background:'#f0fdf4', border:'1px solid #bbf7d0' }}>
+                  <div style={{ fontSize:18, marginBottom:4 }}>{icon}</div>
+                  <div style={{ fontSize:11, fontWeight:700, color:'#15803d' }}>{label}</div>
+                </div>
+              ))}
+            </div>
+            <button onClick={() => setShowUpgrade(true)}
+              style={{ width:'100%', padding:'13px', borderRadius:12, border:'none',
+                background:'linear-gradient(135deg,#22c55e,#15803d)',
+                color:'white', fontWeight:800, fontSize:14, cursor:'pointer',
+                boxShadow:'0 6px 20px rgba(34,197,94,0.40)' }}>
+              Passer au plan Pro — 1 500 FCFA/mois
+            </button>
           </div>
         </div>
       )}
