@@ -8,6 +8,7 @@ import {
 } from 'lucide-react'
 import VaultLogo from '../components/VaultLogo'
 import PaymentModal from '../components/PaymentModal'
+import { supabase } from '../supabase'
 
 const G   = 'linear-gradient(135deg,#22c55e,#15803d)'
 const GO  = 'linear-gradient(135deg,#22c55e,#d97706)'
@@ -130,6 +131,13 @@ export default function LandingPage() {
   const [openFaq, setOpenFaq]           = useState(null)
   const [billingAnnual, setBillingAnnual] = useState(false)
   const [paymentPlan, setPaymentPlan]   = useState(null)
+  const [userCount, setUserCount]       = useState(null)
+
+  useEffect(() => {
+    supabase.rpc('get_user_count').then(({ data }) => {
+      if (data) setUserCount(data)
+    })
+  }, [])
 
   // Inject styles
   useEffect(() => {
@@ -139,9 +147,10 @@ export default function LandingPage() {
     s.textContent = `
       * { box-sizing: border-box; margin: 0; padding: 0 }
       body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif }
-      @keyframes lpFloat { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-12px)} }
-      @keyframes lpFade  { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
-      @keyframes lpGlow  { 0%,100%{box-shadow:0 0 30px rgba(34,197,94,0.20)} 50%{box-shadow:0 0 60px rgba(34,197,94,0.40)} }
+      @keyframes lpFloat    { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-12px)} }
+      @keyframes lpFade     { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
+      @keyframes lpGlow     { 0%,100%{box-shadow:0 0 30px rgba(34,197,94,0.20)} 50%{box-shadow:0 0 60px rgba(34,197,94,0.40)} }
+      @keyframes livePulse  { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.5;transform:scale(1.4)} }
       .lp-fade { animation: lpFade .6s ease forwards }
       .lp-float { animation: lpFloat 3s ease-in-out infinite }
       .lp-glow  { animation: lpGlow  3s ease-in-out infinite }
@@ -384,26 +393,39 @@ export default function LandingPage() {
   /* ════════════════════════════════════
      STATS BAND
   ════════════════════════════════════ */
-  const StatsBand = () => (
-    <div style={{ background:'#0f172a', padding: isMobile ? '40px 20px' : '50px 40px' }}>
-      <div style={{ maxWidth:1140, margin:'0 auto',
-        display:'grid', gridTemplateColumns: isMobile ? '1fr 1fr' : 'repeat(4,1fr)',
-        gap: isMobile ? '32px 20px' : 40, textAlign:'center' }}>
-        {[
-          { val:'AES-256',    label:'Chiffrement militaire' },
-          { val:'0',          label:'Accès serveur à vos données' },
-          { val:'6+',         label:'Moyens de paiement' },
-          { val:'< 2€',       label:'Plan Pro par mois' },
-        ].map(({ val, label }) => (
-          <div key={label}>
-            <div style={{ fontSize: isMobile ? 28 : 36, fontWeight:900, background:GO,
-              WebkitBackgroundClip:'text', WebkitTextFillColor:'transparent', marginBottom:6 }}>{val}</div>
-            <div style={{ fontSize:13, color:'#94a3b8', fontWeight:500 }}>{label}</div>
-          </div>
-        ))}
+  const StatsBand = () => {
+    const userVal = userCount !== null
+      ? (userCount >= 1000 ? `${(userCount/1000).toFixed(1)}k` : `${userCount}`)
+      : '…'
+    const stats = [
+      { val: userVal,   label:'Utilisateurs actifs', live:true },
+      { val:'AES-256',  label:'Chiffrement militaire' },
+      { val:'0',        label:'Accès serveur à vos données' },
+      { val:'< 2€',     label:'Plan Pro par mois' },
+    ]
+    return (
+      <div style={{ background:'#0f172a', padding: isMobile ? '40px 20px' : '50px 40px' }}>
+        <div style={{ maxWidth:1140, margin:'0 auto',
+          display:'grid', gridTemplateColumns: isMobile ? '1fr 1fr' : 'repeat(4,1fr)',
+          gap: isMobile ? '32px 20px' : 40, textAlign:'center' }}>
+          {stats.map(({ val, label, live }) => (
+            <div key={label}>
+              <div style={{ display:'flex', alignItems:'center', justifyContent:'center', gap:6 }}>
+                <div style={{ fontSize: isMobile ? 28 : 36, fontWeight:900, background:GO,
+                  WebkitBackgroundClip:'text', WebkitTextFillColor:'transparent', marginBottom:6 }}>{val}</div>
+                {live && userCount !== null && (
+                  <div style={{ width:7, height:7, borderRadius:'50%', background:'#22c55e',
+                    boxShadow:'0 0 6px #22c55e', marginBottom:4,
+                    animation:'livePulse 2s ease-in-out infinite' }}/>
+                )}
+              </div>
+              <div style={{ fontSize:13, color:'#94a3b8', fontWeight:500 }}>{label}</div>
+            </div>
+          ))}
+        </div>
       </div>
-    </div>
-  )
+    )
+  }
 
   /* ════════════════════════════════════
      COMMENT ÇA MARCHE
