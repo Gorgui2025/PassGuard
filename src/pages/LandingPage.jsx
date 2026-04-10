@@ -99,7 +99,7 @@ const PLANS = [
 
 const PAYMENTS = [
   { name:'Wave',         color:'#2563eb', bg:'#eff6ff', logo:null, available:true  },
-  { name:'Orange Money', color:'#ea580c', bg:'#fff7ed', logo:'🟠', available:true  },
+  { name:'Orange Money', color:'#ea580c', bg:'#fff7ed', logo:null, available:true  },
   { name:'Free Money',   color:'#dc2626', bg:'#fef2f2', logo:'🔴', available:false },
   { name:'MTN MoMo',     color:'#ca8a04', bg:'#fefce8', logo:'📱', available:false },
   { name:'Stripe',       color:'#6366f1', bg:'#eef2ff', logo:'💳', available:false },
@@ -589,23 +589,31 @@ export default function LandingPage() {
         gridTemplateColumns: isMobile ? 'repeat(2,1fr)' : 'repeat(3,1fr)',
         gap:14, maxWidth:640, margin:'0 auto' }}>
         {PAYMENTS.map(({ name, color, bg, logo, available }) => {
-          /* ── Carte spéciale Wave : image pleine ── */
-          if (name === 'Wave') return (
-            <div key={name} className="lp-hover-lift"
-              style={{ borderRadius:18, overflow:'hidden', position:'relative',
-                height:160, boxShadow:'0 4px 20px rgba(21,112,239,0.25)',
-                border:'1px solid #bfdbfe' }}>
-              <img src="/image/wave.jpeg" alt="Wave"
-                style={{ width:'100%', height:'100%', objectFit:'cover', display:'block' }}/>
-              <div style={{ position:'absolute', bottom:0, left:0, right:0,
-                padding:'10px 14px',
-                background:'linear-gradient(to top, rgba(21,112,239,0.85), transparent)',
-                textAlign:'center' }}>
-                <span style={{ fontSize:15, fontWeight:900, color:'white',
-                  textShadow:'0 1px 4px rgba(0,0,0,0.3)' }}>Wave</span>
+          /* ── Cartes avec image pleine (Wave & Orange Money) ── */
+          if (name === 'Wave' || name === 'Orange Money') {
+            const imgSrc    = name === 'Wave' ? '/image/wave.jpeg' : '/image/orange-money.jpeg'
+            const gradColor = name === 'Wave' ? 'rgba(21,112,239,0.85)' : 'rgba(234,88,12,0.85)'
+            const bdColor   = name === 'Wave' ? '#bfdbfe' : '#fed7aa'
+            const shadow    = name === 'Wave'
+              ? '0 4px 20px rgba(21,112,239,0.25)'
+              : '0 4px 20px rgba(234,88,12,0.25)'
+            return (
+              <div key={name} className="lp-hover-lift"
+                style={{ borderRadius:18, overflow:'hidden', position:'relative',
+                  height:160, boxShadow:shadow, border:`1px solid ${bdColor}` }}>
+                <img src={imgSrc} alt={name}
+                  style={{ width:'100%', height:'100%', objectFit:'cover', display:'block' }}/>
+                <div style={{ position:'absolute', bottom:0, left:0, right:0,
+                  padding:'10px 14px',
+                  background:`linear-gradient(to top, ${gradColor}, transparent)`,
+                  textAlign:'center' }}>
+                  <span style={{ fontSize:15, fontWeight:900, color:'white',
+                    textShadow:'0 1px 4px rgba(0,0,0,0.3)' }}>{name}</span>
+                </div>
               </div>
-            </div>
-          )
+            )
+          }
+
 
           /* ── Cartes standard ── */
           return (
