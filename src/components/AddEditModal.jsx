@@ -192,6 +192,7 @@ export default function AddEditModal({ entry, onClose, onSaved }) {
               <Label>Site / Service</Label>
               <input type="text" value={site} onChange={e => setSite(e.target.value)}
                 placeholder="ex : Google, Wave, BHS..."
+                maxLength={100}
                 style={inputStyle} onFocus={onFocus} onBlur={onBlur}/>
             </div>
 
@@ -200,6 +201,7 @@ export default function AddEditModal({ entry, onClose, onSaved }) {
               <Label>Identifiant</Label>
               <input type="text" value={username} onChange={e => setUsername(e.target.value)}
                 placeholder="Email ou nom d'utilisateur"
+                maxLength={150}
                 style={inputStyle} onFocus={onFocus} onBlur={onBlur}/>
             </div>
 
@@ -211,6 +213,7 @@ export default function AddEditModal({ entry, onClose, onSaved }) {
                   <input type={showPwd ? 'text' : 'password'} value={password}
                     onChange={e => setPassword(e.target.value)}
                     placeholder="Votre mot de passe"
+                    maxLength={500}
                     style={{ ...inputStyle, fontFamily:'monospace', paddingRight:42 }}
                     onFocus={onFocus} onBlur={onBlur}/>
                   <button type="button" onClick={() => setShowPwd(!showPwd)}
@@ -250,6 +253,7 @@ export default function AddEditModal({ entry, onClose, onSaved }) {
               <Label>Notes <span style={{ fontWeight:400, textTransform:'none', color:'#d1d5db', letterSpacing:0 }}>(optionnel)</span></Label>
               <textarea value={notes} onChange={e => setNotes(e.target.value)}
                 placeholder="Informations supplémentaires..." rows={2}
+                maxLength={500}
                 style={{ ...inputStyle, resize:'none', fontFamily:'inherit' }}
                 onFocus={onFocus} onBlur={onBlur}/>
             </div>

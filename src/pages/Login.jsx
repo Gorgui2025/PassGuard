@@ -1,9 +1,12 @@
-import { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
-import { Eye, EyeOff, ArrowLeft, Mail } from 'lucide-react'
+import { Eye, EyeOff, ArrowLeft, Mail, ShieldAlert, Lock } from 'lucide-react'
 import VaultLogo from '../components/VaultLogo'
 import { supabase } from '../supabase'
+import {
+  checkRateLimit, recordFailedAttempt, clearRateLimit, MAX_ATTEMPTS
+} from '../utils/rateLimiter'
 
 const G  = 'linear-gradient(135deg,#22c55e,#15803d)'
 const GO = 'linear-gradient(135deg,#22c55e,#d97706)'
@@ -21,6 +24,13 @@ const Label = ({ children }) => (
     letterSpacing:1.5, marginBottom:8 }}>{children}</div>
 )
 
+/* ── Formatage du countdown mm:ss ── */
+function fmtTime(sec) {
+  const m = Math.floor(sec / 60).toString().padStart(2, '0')
+  const s = (sec % 60).toString().padStart(2, '0')
+  return `${m}:${s}`
+}
+
 /* ── Vue : formulaire connexion/inscription ── */
 function AuthForm({ onForgot }) {
   const { login, register } = useAuth()
@@ -32,24 +42,80 @@ function AuthForm({ onForgot }) {
   const [error, setError]           = useState('')
   const [success, setSuccess]       = useState('')
   const [loading, setLoading]       = useState(false)
+  const [lockSeconds, setLockSeconds] = useState(0)
+  const lockTimerRef = useRef(null)
+
+  /* ── Démarre le countdown de blocage ── */
+  const startCountdown = (seconds) => {
+    setLockSeconds(seconds)
+    clearInterval(lockTimerRef.current)
+    lockTimerRef.current = setInterval(() => {
+      setLockSeconds(prev => {
+        if (prev <= 1) { clearInterval(lockTimerRef.current); return 0 }
+        return prev - 1
+      })
+    }, 1000)
+  }
+
+  /* ── Vérifie le verrou au montage et quand l'email change ── */
+  useEffect(() => {
+    if (isRegister || !email) return
+    const status = checkRateLimit(email)
+    if (status.blocked) {
+      startCountdown(Math.ceil((status.lockedUntil - Date.now()) / 1000))
+    } else {
+      setLockSeconds(0)
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [email, isRegister])
+
+  useEffect(() => () => clearInterval(lockTimerRef.current), [])
+
+  const isLocked = lockSeconds > 0
 
   const handleSubmit = async (e) => {
     e.preventDefault()
     setError(''); setSuccess('')
+
+    /* ── Vérification du verrou (login uniquement) ── */
+    if (!isRegister) {
+      const status = checkRateLimit(email)
+      if (status.blocked) {
+        startCountdown(Math.ceil((status.lockedUntil - Date.now()) / 1000))
+        return
+      }
+    }
+
     if (isRegister && password !== confirm)
       return setError('Les mots de passe ne correspondent pas.')
     if (password.length < 8)
       return setError('Le mot de passe doit faire au moins 8 caractères.')
+
     setLoading(true)
     try {
       const result = await (isRegister ? register(email, password) : login(email, password))
+      if (!isRegister) clearRateLimit(email) // Succès → reset compteur
       if (isRegister && result?.user && !result?.session) {
         setSuccess('Compte créé ! Vérifiez votre boîte mail pour confirmer votre adresse.')
       }
     } catch (err) {
       const msg = err.message || ''
-      if (msg.includes('Invalid login credentials') || msg.includes('invalid_credentials'))
-        setError('Email ou mot de passe incorrect.')
+      if (msg.includes('Invalid login credentials') || msg.includes('invalid_credentials')) {
+        /* ── Enregistre l'échec et calcule les tentatives restantes ── */
+        if (!isRegister) {
+          const data = recordFailedAttempt(email)
+          if (data.lockedUntil) {
+            const secs = Math.ceil((data.lockedUntil - Date.now()) / 1000)
+            startCountdown(secs)
+            setError(`Compte bloqué après ${MAX_ATTEMPTS} tentatives échouées. Réessayez dans ${fmtTime(secs)}.`)
+          } else {
+            const left = MAX_ATTEMPTS - data.count
+            setError(`Email ou mot de passe incorrect. ${left} tentative${left > 1 ? 's' : ''} restante${left > 1 ? 's' : ''}.`)
+          }
+        } else {
+          setError('Email ou mot de passe incorrect.')
+        }
+      }
       else if (msg.includes('Email not confirmed'))
         setError('Veuillez confirmer votre email avant de vous connecter.')
       else if (msg.includes('User already registered') || msg.includes('already been registered'))
@@ -141,12 +207,45 @@ function AuthForm({ onForgot }) {
           </div>
         )}
 
-        <button type="submit" disabled={loading}
-          style={{ padding:'14px', borderRadius:14, border:'none', background:G,
-            color:'white', fontWeight:800, fontSize:14, cursor:'pointer',
-            opacity: loading ? 0.7 : 1, boxShadow:'0 8px 24px rgba(34,197,94,0.35)',
+        {/* ── Écran de blocage rate-limit ── */}
+        {isLocked && (
+          <div style={{ padding:'16px', borderRadius:14, textAlign:'center',
+            background:'linear-gradient(135deg,#fef2f2,#fff1f1)',
+            border:'1.5px solid #fecaca' }}>
+            <div style={{ display:'flex', justifyContent:'center', marginBottom:10 }}>
+              <div style={{ width:40, height:40, borderRadius:12,
+                background:'linear-gradient(135deg,#ef4444,#dc2626)',
+                display:'flex', alignItems:'center', justifyContent:'center' }}>
+                <ShieldAlert size={20} color="white"/>
+              </div>
+            </div>
+            <div style={{ fontSize:13, fontWeight:800, color:'#dc2626', marginBottom:4 }}>
+              Compte temporairement bloqué
+            </div>
+            <div style={{ fontSize:12, color:'#ef4444', marginBottom:10 }}>
+              Trop de tentatives échouées
+            </div>
+            <div style={{ display:'inline-flex', alignItems:'center', gap:6,
+              padding:'8px 16px', borderRadius:999,
+              background:'#dc2626', color:'white' }}>
+              <Lock size={12}/>
+              <span style={{ fontSize:16, fontWeight:900, fontFamily:'monospace', letterSpacing:2 }}>
+                {fmtTime(lockSeconds)}
+              </span>
+            </div>
+          </div>
+        )}
+
+        <button type="submit" disabled={loading || isLocked}
+          style={{ padding:'14px', borderRadius:14, border:'none',
+            background: isLocked ? '#e2e8f0' : G,
+            color: isLocked ? '#94a3b8' : 'white',
+            fontWeight:800, fontSize:14,
+            cursor: isLocked ? 'not-allowed' : 'pointer',
+            opacity: loading ? 0.7 : 1,
+            boxShadow: isLocked ? 'none' : '0 8px 24px rgba(34,197,94,0.35)',
             marginTop:4 }}>
-          {loading ? 'Chargement…' : isRegister ? 'Créer mon compte' : 'Se connecter'}
+          {loading ? 'Chargement…' : isLocked ? `Bloqué (${fmtTime(lockSeconds)})` : isRegister ? 'Créer mon compte' : 'Se connecter'}
         </button>
       </form>
 

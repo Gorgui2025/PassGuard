@@ -1,0 +1,33 @@
+[build]
+  command = "npm run build"
+  publish = "dist"
+
+# ── En-têtes de sécurité HTTP ────────────────────────────────────────────────
+[[headers]]
+  for = "/*"
+  [headers.values]
+    # Empêche l'intégration dans une iframe (clickjacking)
+    X-Frame-Options = "DENY"
+
+    # Empêche les navigateurs de deviner le type MIME (MIME sniffing)
+    X-Content-Type-Options = "nosniff"
+
+    # Active le filtre XSS des anciens navigateurs
+    X-XSS-Protection = "1; mode=block"
+
+    # Contrôle les informations de référent envoyées aux tiers
+    Referrer-Policy = "strict-origin-when-cross-origin"
+
+    # Désactive les APIs sensibles non utilisées
+    Permissions-Policy = "camera=(), microphone=(), geolocation=(), payment=(), usb=(), interest-cohort=()"
+
+    # Force HTTPS pendant 2 ans (HSTS)
+    Strict-Transport-Security = "max-age=63072000; includeSubDomains; preload"
+
+    # Politique de sécurité du contenu (CSP)
+    # - script-src 'self'         : uniquement les scripts du domaine (bundle Vite)
+    # - style-src 'unsafe-inline' : nécessaire pour les styles React inline
+    # - connect-src               : autorise uniquement Supabase (HTTP + WebSocket)
+    # - frame-ancestors 'none'    : redondant avec X-Frame-Options, couvre les navigateurs modernes
+    # - object-src 'none'         : bloque Flash et autres plugins dangereux
+    Content-Security-Policy = "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https:; connect-src 'self' https://*.supabase.co https://*.supabase.io wss://*.supabase.co wss://*.supabase.io; font-src 'self' data:; frame-ancestors 'none'; base-uri 'self'; form-action 'self'; object-src 'none';"
