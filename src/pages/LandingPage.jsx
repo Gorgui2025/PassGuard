@@ -6,6 +6,7 @@ import {
   Eye, Copy, Key, RefreshCw, Shield, Cpu, Cloud,
 } from 'lucide-react'
 import VaultLogo from '../components/VaultLogo'
+import PaymentModal from '../components/PaymentModal'
 
 const G   = 'linear-gradient(135deg,#22c55e,#15803d)'
 const GO  = 'linear-gradient(135deg,#22c55e,#d97706)'
@@ -540,7 +541,11 @@ export default function LandingPage() {
                 </div>
 
                 {/* Bouton */}
-                <button onClick={() => navigate('/login')}
+                <button
+                  onClick={() => {
+                    if (plan.id === 'free') navigate('/login')
+                    else setPaymentPlan(plan)
+                  }}
                   style={{ width:'100%', padding:'13px', borderRadius:14, cursor:'pointer',
                     fontWeight:800, fontSize:14, border: plan.btnBorder || 'none',
                     background: isColored ? plan.btnBg : G,
@@ -550,7 +555,7 @@ export default function LandingPage() {
                       : '0 4px 14px rgba(34,197,94,0.30)',
                     transition:'opacity .15s' }}>
                   {plan.id === 'free' ? 'Démarrer gratuitement' :
-                   plan.id === 'business' ? 'Contacter l\'équipe' : 'Choisir ce plan'}
+                   plan.id === 'business' ? 'Souscrire au Business' : 'Choisir ce plan'}
                 </button>
               </div>
             </div>
@@ -784,6 +789,7 @@ export default function LandingPage() {
   )
 
   const WA_LINK = 'https://wa.me/221779819588?text=Bonjour%20PassGuard%2C%20j%27ai%20besoin%20d%27aide.'
+  const [paymentPlan, setPaymentPlan] = useState(null)
 
   return (
     <div style={{ minHeight:'100vh', background:'white' }}>
@@ -797,6 +803,11 @@ export default function LandingPage() {
       <Faq/>
       <CtaFinal/>
       <Footer/>
+
+      {/* ── Modal de paiement ── */}
+      {paymentPlan && (
+        <PaymentModal plan={paymentPlan} onClose={() => setPaymentPlan(null)}/>
+      )}
 
       {/* ── Bouton WhatsApp flottant ── */}
       <a href={WA_LINK} target="_blank" rel="noopener noreferrer"
