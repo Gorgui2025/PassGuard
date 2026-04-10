@@ -766,7 +766,7 @@ export default function LandingPage() {
           display:'flex', alignItems:'center', justifyContent:'space-between',
           flexWrap:'wrap', gap:12 }}>
           <span style={{ fontSize:12, color:'#475569' }}>© 2026 PassGuard · Tous droits réservés</span>
-          <span style={{ fontSize:12, color:'#334155' }}>Conçu avec ❤️ pour l'Afrique</span>
+          <span style={{ fontSize:12, color:'#334155' }}>Conçu avec passion pour l'Afrique</span>
         </div>
       </div>
     </footer>
