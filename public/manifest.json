@@ -1,0 +1,35 @@
+{
+  "name": "PassGuard — Gestionnaire de mots de passe",
+  "short_name": "PassGuard",
+  "description": "Gérez vos mots de passe en toute sécurité, chiffrés avec AES-256.",
+  "start_url": "/app",
+  "display": "standalone",
+  "background_color": "#0f172a",
+  "theme_color": "#22c55e",
+  "orientation": "portrait-primary",
+  "lang": "fr",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
+    }
+  ],
+  "screenshots": [],
+  "categories": ["productivity", "utilities"],
+  "shortcuts": [
+    {
+      "name": "Ouvrir le coffre",
+      "short_name": "Coffre",
+      "url": "/app",
+      "description": "Accédez directement à vos mots de passe"
+    }
+  ]
+}
