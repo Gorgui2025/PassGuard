@@ -125,9 +125,10 @@ export default function LandingPage() {
   const width    = useWidth()
   const isMobile = width < 768
   const isTablet = width >= 768 && width < 1024
-  const [menuOpen, setMenuOpen]   = useState(false)
-  const [openFaq, setOpenFaq]     = useState(null)
+  const [menuOpen, setMenuOpen]         = useState(false)
+  const [openFaq, setOpenFaq]           = useState(null)
   const [billingAnnual, setBillingAnnual] = useState(false)
+  const [paymentPlan, setPaymentPlan]   = useState(null)
 
   // Inject styles
   useEffect(() => {
@@ -789,7 +790,6 @@ export default function LandingPage() {
   )
 
   const WA_LINK = 'https://wa.me/221779819588?text=Bonjour%20PassGuard%2C%20j%27ai%20besoin%20d%27aide.'
-  const [paymentPlan, setPaymentPlan] = useState(null)
 
   return (
     <div style={{ minHeight:'100vh', background:'white' }}>
