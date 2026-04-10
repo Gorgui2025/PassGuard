@@ -4,6 +4,7 @@ import {
   Lock, Smartphone, Globe, Zap, Users, Briefcase,
   CheckCircle2, ArrowRight, Star, ChevronDown, Menu, X,
   Eye, Copy, Key, RefreshCw, Shield, Cpu, Cloud,
+  UserPlus, KeyRound, PlusCircle, MonitorSmartphone,
 } from 'lucide-react'
 import VaultLogo from '../components/VaultLogo'
 import PaymentModal from '../components/PaymentModal'
@@ -207,9 +208,10 @@ export default function LandingPage() {
         {/* Desktop links */}
         {!isMobile && (
           <div style={{ display:'flex', alignItems:'center', gap:32 }}>
-            <a href="#fonctionnalites" className="lp-link">Fonctionnalités</a>
-            <a href="#tarifs"          className="lp-link">Tarifs</a>
-            <a href="#faq"             className="lp-link">FAQ</a>
+            <a href="#fonctionnalites"     className="lp-link">Fonctionnalités</a>
+            <a href="#comment-ca-marche"  className="lp-link">Comment ça marche</a>
+            <a href="#tarifs"             className="lp-link">Tarifs</a>
+            <a href="#faq"               className="lp-link">FAQ</a>
           </div>
         )}
 
@@ -243,7 +245,7 @@ export default function LandingPage() {
       {isMobile && menuOpen && (
         <div style={{ paddingTop:16, paddingBottom:8, borderTop:'1px solid #f0fdf4', marginTop:14,
           display:'flex', flexDirection:'column', gap:4 }}>
-          {[['Fonctionnalités','#fonctionnalites'],['Tarifs','#tarifs'],['FAQ','#faq']].map(([label, href]) => (
+          {[['Fonctionnalités','#fonctionnalites'],['Comment ça marche','#comment-ca-marche'],['Tarifs','#tarifs'],['FAQ','#faq']].map(([label, href]) => (
             <a key={label} href={href} className="lp-link"
               onClick={() => setMenuOpen(false)}
               style={{ padding:'10px 4px', display:'block' }}>{label}</a>
@@ -401,6 +403,105 @@ export default function LandingPage() {
       </div>
     </div>
   )
+
+  /* ════════════════════════════════════
+     COMMENT ÇA MARCHE
+  ════════════════════════════════════ */
+  const HowItWorks = () => {
+    const steps = [
+      {
+        num: 1,
+        icon: UserPlus,
+        title: 'Créez votre compte',
+        desc: 'Inscrivez-vous en 30 secondes. Aucune carte bancaire requise. Le plan gratuit est disponible immédiatement.',
+        color: '#15803d', bg: '#f0fdf4', border: '#bbf7d0',
+      },
+      {
+        num: 2,
+        icon: KeyRound,
+        title: 'Définissez votre mot de passe maître',
+        desc: 'Ce mot de passe unique chiffre toutes vos données localement en AES-256. Personne d\'autre ne peut y accéder.',
+        color: '#d97706', bg: '#fffbeb', border: '#fde68a',
+      },
+      {
+        num: 3,
+        icon: PlusCircle,
+        title: 'Ajoutez vos mots de passe',
+        desc: 'Saisissez manuellement ou utilisez le générateur intégré pour créer des mots de passe forts en un clic.',
+        color: '#15803d', bg: '#f0fdf4', border: '#bbf7d0',
+      },
+      {
+        num: 4,
+        icon: MonitorSmartphone,
+        title: 'Accédez depuis n\'importe quel appareil',
+        desc: 'Téléphone, tablette, ordinateur — vos mots de passe sont synchronisés en temps réel et toujours disponibles.',
+        color: '#d97706', bg: '#fffbeb', border: '#fde68a',
+      },
+    ]
+    return (
+      <Section id="comment-ca-marche" bg="white">
+        <div style={{ textAlign:'center' }}>
+          <SectionBadge color="#15803d" bg="#f0fdf4"><Zap size={11}/> Simple & Rapide</SectionBadge>
+          <SectionTitle>Comment ça marche ?</SectionTitle>
+          <SectionSub>Protégez tous vos comptes en moins de 2 minutes. Quatre étapes, c'est tout.</SectionSub>
+        </div>
+
+        <div style={{ display:'grid',
+          gridTemplateColumns: isMobile ? '1fr' : isTablet ? '1fr 1fr' : 'repeat(4,1fr)',
+          gap: isMobile ? 16 : 24, position:'relative' }}>
+
+          {/* Ligne de connexion (desktop uniquement) */}
+          {!isMobile && !isTablet && (
+            <div style={{ position:'absolute', top:36, left:'12.5%', right:'12.5%', height:2,
+              background:'linear-gradient(to right,#bbf7d0,#fde68a,#bbf7d0,#fde68a)',
+              zIndex:0, borderRadius:999 }}/>
+          )}
+
+          {steps.map(({ num, icon:Icon, title, desc, color, bg, border }) => (
+            <div key={num} style={{ background:'white', borderRadius:20,
+              border:`1.5px solid ${border}`, padding:'28px 22px',
+              textAlign:'center', position:'relative', zIndex:1,
+              boxShadow:'0 4px 20px rgba(0,0,0,0.05)' }}>
+
+              {/* Numéro */}
+              <div style={{ position:'absolute', top:-14, left:'50%', transform:'translateX(-50%)',
+                width:28, height:28, borderRadius:999,
+                background:G, display:'flex', alignItems:'center', justifyContent:'center',
+                fontSize:11, fontWeight:900, color:'white',
+                boxShadow:'0 4px 12px rgba(34,197,94,0.40)' }}>
+                {num}
+              </div>
+
+              {/* Icône */}
+              <div style={{ width:56, height:56, borderRadius:16, background:bg,
+                border:`1.5px solid ${border}`, margin:'12px auto 18px',
+                display:'flex', alignItems:'center', justifyContent:'center' }}>
+                <Icon size={24} color={color} strokeWidth={2}/>
+              </div>
+
+              <div style={{ fontSize:14, fontWeight:800, color:'#0f172a', marginBottom:10, lineHeight:1.3 }}>
+                {title}
+              </div>
+              <div style={{ fontSize:13, color:'#64748b', lineHeight:1.6 }}>
+                {desc}
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* CTA sous les étapes */}
+        <div style={{ textAlign:'center', marginTop:40 }}>
+          <button onClick={() => navigate('/login')}
+            style={{ display:'inline-flex', alignItems:'center', gap:8,
+              padding:'14px 32px', borderRadius:14, border:'none',
+              background:G, color:'white', fontWeight:800, fontSize:14,
+              cursor:'pointer', boxShadow:'0 6px 20px rgba(34,197,94,0.35)' }}>
+            Commencer gratuitement <ArrowRight size={15}/>
+          </button>
+        </div>
+      </Section>
+    )
+  }
 
   /* ════════════════════════════════════
      FEATURES
@@ -832,6 +933,7 @@ export default function LandingPage() {
       <Nav/>
       <Hero/>
       <StatsBand/>
+      <HowItWorks/>
       <Features/>
       <Pricing/>
       <Payments/>
