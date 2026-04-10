@@ -345,15 +345,20 @@ export default function LandingPage() {
               </div>
             </div>
             {[
-              { site:'Wave', cat:'banque',   color:'#2563eb', grad:'linear-gradient(135deg,#3b82f6,#2563eb)' },
-              { site:'Gmail', cat:'email',   color:'#d97706', grad:'linear-gradient(135deg,#fbbf24,#d97706)' },
-              { site:'LinkedIn', cat:'travail', color:'#f59e0b', grad:'linear-gradient(135deg,#fcd34d,#d97706)' },
-            ].map(({ site, grad }) => (
+              { site:'Wave',     domain:'wave.com',     bg:'#eff6ff' },
+              { site:'Gmail',    domain:'gmail.com',    bg:'#fef2f2' },
+              { site:'LinkedIn', domain:'linkedin.com', bg:'#eff6ff' },
+            ].map(({ site, domain, bg }) => (
               <div key={site} style={{ display:'flex', alignItems:'center', gap:10,
                 padding:'10px 0', borderBottom:'1px solid #f8fafc' }}>
-                <div style={{ width:36, height:36, borderRadius:11, background:grad, flexShrink:0,
-                  display:'flex', alignItems:'center', justifyContent:'center' }}>
-                  <span style={{ color:'white', fontWeight:900, fontSize:14 }}>{site[0]}</span>
+                <div style={{ width:36, height:36, borderRadius:11, background:bg, flexShrink:0,
+                  display:'flex', alignItems:'center', justifyContent:'center',
+                  border:'1px solid #e2e8f0', overflow:'hidden' }}>
+                  <img
+                    src={`https://www.google.com/s2/favicons?domain=${domain}&sz=64`}
+                    alt={site}
+                    style={{ width:22, height:22, objectFit:'contain' }}
+                  />
                 </div>
                 <div style={{ flex:1 }}>
                   <div style={{ fontWeight:700, fontSize:13, color:'#0f172a' }}>{site}</div>
