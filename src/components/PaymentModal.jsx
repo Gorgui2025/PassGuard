@@ -32,7 +32,9 @@ export default function PaymentModal({ plan, onClose }) {
   const accent  = isWave ? '#1570ef' : '#f97316'
   const accentL = isWave ? '#eff6ff' : '#fff7ed'
   const accentB = isWave ? '#bfdbfe' : '#fed7aa'
-  const emoji   = isWave ? '🌊' : '🟠'
+  const emoji   = isWave
+    ? <img src="/image/wave.jpeg" alt="Wave" style={{ width:28, height:28, borderRadius:8, objectFit:'cover' }}/>
+    : '🟠'
   const label   = isWave ? 'Wave' : 'Orange Money'
 
   const waText = encodeURIComponent(
@@ -121,7 +123,10 @@ export default function PaymentModal({ plan, onClose }) {
         <div style={{ width: 48, height: 48, borderRadius: 14, flexShrink: 0,
           background: 'rgba(255,255,255,0.20)',
           display: 'flex', alignItems: 'center', justifyContent: 'center',
-          fontSize: 26 }}>🌊</div>
+          overflow: 'hidden' }}>
+          <img src="/image/wave.jpeg" alt="Wave"
+            style={{ width: '100%', height: '100%', objectFit: 'cover' }}/>
+        </div>
         <div style={{ flex: 1 }}>
           <div style={{ fontSize: 16, fontWeight: 900, color: 'white' }}>Wave</div>
           <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.80)', marginTop: 2 }}>

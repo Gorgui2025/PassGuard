@@ -98,7 +98,7 @@ const PLANS = [
 ]
 
 const PAYMENTS = [
-  { name:'Wave',         color:'#2563eb', bg:'#eff6ff', logo:'🌊', available:true  },
+  { name:'Wave',         color:'#2563eb', bg:'#eff6ff', logo:<img src="/image/wave.jpeg" alt="Wave" style={{ width:28, height:28, borderRadius:6, objectFit:'cover' }}/>, available:true  },
   { name:'Orange Money', color:'#ea580c', bg:'#fff7ed', logo:'🟠', available:true  },
   { name:'Free Money',   color:'#dc2626', bg:'#fef2f2', logo:'🔴', available:false },
   { name:'MTN MoMo',     color:'#ca8a04', bg:'#fefce8', logo:'📱', available:false },
