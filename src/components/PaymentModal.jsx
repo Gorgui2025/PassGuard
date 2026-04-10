@@ -16,9 +16,11 @@ function generateRef() {
 export default function PaymentModal({ plan, onClose }) {
   const { isMobile }        = useBreakpoint()
   const [method, setMethod] = useState(null)   // 'wave' | 'om'
-  const [step, setStep]     = useState(1)      // 1=choix  2=instructions  3=whatsapp
+  const [step, setStep]     = useState(1)      // 1=choix  2=instructions  3=email  4=whatsapp
   const [copied, setCopied] = useState(null)
   const [ref]               = useState(generateRef)
+  const [email, setEmail]   = useState('')
+  const [emailError, setEmailError] = useState('')
 
   const copy = (text, key) => {
     navigator.clipboard.writeText(text)
@@ -36,10 +38,10 @@ export default function PaymentModal({ plan, onClose }) {
   const waText = encodeURIComponent(
     `Bonjour PassGuard 👋\n\n` +
     `Paiement effectué pour le plan *${plan.name}*.\n\n` +
+    `📧 Email     : ${email}\n` +
     `💰 Montant   : ${plan.price} FCFA\n` +
     `💳 Méthode   : ${label}\n` +
-    `🔖 Référence : ${ref}\n` +
-    `📧 Mon email : (remplacez par votre email)\n\n` +
+    `🔖 Référence : ${ref}\n\n` +
     `📸 Capture du paiement en pièce jointe.\n\n` +
     `Merci d'activer mon abonnement.`
   )
@@ -229,7 +231,7 @@ export default function PaymentModal({ plan, onClose }) {
           color: 'white', fontWeight: 800, fontSize: 14, cursor: 'pointer',
           boxShadow: `0 6px 20px ${isWave ? 'rgba(21,112,239,0.35)' : 'rgba(249,115,22,0.35)'}`,
           marginBottom: 10 }}>
-        ✓ J'ai payé — Confirmer sur WhatsApp
+        ✓ J'ai payé → Étape suivante
       </button>
 
       <button onClick={() => setStep(1)}
@@ -241,7 +243,86 @@ export default function PaymentModal({ plan, onClose }) {
     </>
   )
 
-  /* ── ÉTAPE 3 : Confirmation WhatsApp ── */
+  /* ── ÉTAPE 3 : Saisie email ── */
+  const StepEmail = () => {
+    const handleNext = () => {
+      const trimmed = email.trim().toLowerCase()
+      if (!trimmed) return setEmailError('Votre email est obligatoire.')
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmed))
+        return setEmailError('Adresse email invalide.')
+      setEmail(trimmed)
+      setEmailError('')
+      setStep(4)
+    }
+
+    return (
+      <>
+        <div style={{ textAlign: 'center', marginBottom: 22 }}>
+          <div style={{ width: 56, height: 56, borderRadius: 16, margin: '0 auto 14px',
+            background: `linear-gradient(135deg,${accent},${isWave ? '#0ea5e9' : '#c2410c'})`,
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            fontSize: 26 }}>{emoji}</div>
+          <div style={{ fontSize: 17, fontWeight: 900, color: '#0f172a', marginBottom: 6 }}>
+            Votre email PassGuard
+          </div>
+          <p style={{ fontSize: 13, color: '#64748b', lineHeight: 1.7, margin: 0 }}>
+            Entrez l'email associé à votre compte PassGuard.<br/>
+            Il nous permettra d'<strong>activer votre abonnement</strong>.
+          </p>
+        </div>
+
+        <div style={{ marginBottom: 6 }}>
+          <div style={{ fontSize: 11, fontWeight: 800, color: '#475569',
+            textTransform: 'uppercase', letterSpacing: 1.5, marginBottom: 8 }}>
+            Email PassGuard
+          </div>
+          <input
+            type="email"
+            value={email}
+            onChange={e => { setEmail(e.target.value); setEmailError('') }}
+            placeholder="vous@exemple.com"
+            autoFocus
+            style={{ width: '100%', padding: '13px 16px', borderRadius: 14, boxSizing: 'border-box',
+              border: `1.5px solid ${emailError ? '#ef4444' : '#e2e8f0'}`,
+              fontSize: 14, color: '#1e293b', outline: 'none', background: '#f8fafc' }}
+            onFocus={e => { e.target.style.borderColor = accent; e.target.style.boxShadow = `0 0 0 3px ${accent}20` }}
+            onBlur={e  => { e.target.style.borderColor = emailError ? '#ef4444' : '#e2e8f0'; e.target.style.boxShadow = 'none' }}
+            onKeyDown={e => e.key === 'Enter' && handleNext()}
+          />
+          {emailError && (
+            <div style={{ fontSize: 12, color: '#ef4444', fontWeight: 600, marginTop: 6 }}>
+              ⚠ {emailError}
+            </div>
+          )}
+        </div>
+
+        <div style={{ padding: '11px 14px', borderRadius: 12,
+          background: '#f0fdf4', border: '1px solid #bbf7d0', marginBottom: 20, marginTop: 12 }}>
+          <p style={{ fontSize: 12, color: '#15803d', margin: 0, lineHeight: 1.6 }}>
+            🔒 Cet email sera inclus dans votre message WhatsApp et utilisé uniquement pour activer votre abonnement.
+          </p>
+        </div>
+
+        <button onClick={handleNext}
+          style={{ width: '100%', padding: '14px', borderRadius: 14, border: 'none',
+            background: `linear-gradient(135deg,${accent},${isWave ? '#0ea5e9' : '#c2410c'})`,
+            color: 'white', fontWeight: 800, fontSize: 14, cursor: 'pointer',
+            boxShadow: `0 6px 20px ${isWave ? 'rgba(21,112,239,0.35)' : 'rgba(249,115,22,0.35)'}`,
+            marginBottom: 10 }}>
+          Continuer →
+        </button>
+
+        <button onClick={() => setStep(2)}
+          style={{ width: '100%', padding: '11px', borderRadius: 12,
+            border: '1.5px solid #e2e8f0', background: 'white', color: '#64748b',
+            fontWeight: 600, fontSize: 13, cursor: 'pointer' }}>
+          ← Retour aux instructions
+        </button>
+      </>
+    )
+  }
+
+  /* ── ÉTAPE 4 : Confirmation WhatsApp ── */
   const StepWhatsApp = () => (
     <>
       <div style={{ textAlign: 'center', marginBottom: 22 }}>
@@ -264,6 +345,7 @@ export default function PaymentModal({ plan, onClose }) {
       <div style={{ padding: '14px 16px', borderRadius: 14,
         background: '#f8fafc', border: '1px solid #e2e8f0', marginBottom: 20 }}>
         {[
+          { l: 'Email',     v: email },
           { l: 'Plan',      v: plan.name },
           { l: 'Montant',   v: `${plan.price} FCFA` },
           { l: 'Méthode',   v: label },
@@ -274,7 +356,8 @@ export default function PaymentModal({ plan, onClose }) {
             borderBottom: l !== 'Référence' ? '1px solid #f1f5f9' : 'none' }}>
             <span style={{ color: '#94a3b8', fontWeight: 600 }}>{l}</span>
             <span style={{ color: '#0f172a', fontWeight: 800,
-              fontFamily: l === 'Référence' ? 'monospace' : 'inherit' }}>{v}</span>
+              fontFamily: l === 'Référence' ? 'monospace' : 'inherit',
+            wordBreak: l === 'Email' ? 'break-all' : 'normal' }}>{v}</span>
           </div>
         ))}
       </div>
@@ -307,7 +390,7 @@ export default function PaymentModal({ plan, onClose }) {
   )
 
   /* ── Render ── */
-  const titles = ['Mode de paiement', 'Instructions', 'Confirmation']
+  const titles = ['Mode de paiement', 'Instructions', 'Votre email', 'Confirmation']
 
   return (
     <div onClick={e => e.target === e.currentTarget && onClose()}
@@ -326,10 +409,10 @@ export default function PaymentModal({ plan, onClose }) {
           borderBottom: '1px solid #f1f5f9',
           position: 'sticky', top: 0, background: 'white', zIndex: 1 }}>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            {[1, 2, 3].map(n => (
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+            {[1, 2, 3, 4].map(n => (
               <div key={n} style={{ height: 7, borderRadius: 999, transition: 'all .3s',
-                width: step === n ? 24 : 8,
+                width: step === n ? 20 : 7,
                 background: n <= step ? '#22c55e' : '#e2e8f0' }}/>
             ))}
             <span style={{ fontSize: 12, color: '#64748b', fontWeight: 600, marginLeft: 4 }}>
@@ -351,7 +434,8 @@ export default function PaymentModal({ plan, onClose }) {
         <div style={{ padding: isMobile ? '20px 20px 28px' : '20px 24px 24px' }}>
           {step === 1 && <StepChoix/>}
           {step === 2 && <StepInstructions/>}
-          {step === 3 && <StepWhatsApp/>}
+          {step === 3 && <StepEmail/>}
+          {step === 4 && <StepWhatsApp/>}
         </div>
       </div>
     </div>
