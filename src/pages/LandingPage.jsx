@@ -97,12 +97,12 @@ const PLANS = [
 ]
 
 const PAYMENTS = [
-  { name:'Wave',         color:'#2563eb', bg:'#eff6ff', logo:'🌊' },
-  { name:'Orange Money', color:'#ea580c', bg:'#fff7ed', logo:'🟠' },
-  { name:'Free Money',   color:'#dc2626', bg:'#fef2f2', logo:'🔴' },
-  { name:'MTN MoMo',     color:'#ca8a04', bg:'#fefce8', logo:'📱' },
-  { name:'Stripe',       color:'#6366f1', bg:'#eef2ff', logo:'💳' },
-  { name:'PayPal',       color:'#1d4ed8', bg:'#eff6ff', logo:'🅿️' },
+  { name:'Wave',         color:'#2563eb', bg:'#eff6ff', logo:'🌊', available:true  },
+  { name:'Orange Money', color:'#ea580c', bg:'#fff7ed', logo:'🟠', available:true  },
+  { name:'Free Money',   color:'#dc2626', bg:'#fef2f2', logo:'🔴', available:false },
+  { name:'MTN MoMo',     color:'#ca8a04', bg:'#fefce8', logo:'📱', available:false },
+  { name:'Stripe',       color:'#6366f1', bg:'#eef2ff', logo:'💳', available:false },
+  { name:'PayPal',       color:'#1d4ed8', bg:'#eff6ff', logo:'🅿️', available:false },
 ]
 
 const TESTIMONIALS = [
@@ -582,13 +582,24 @@ export default function LandingPage() {
       <div style={{ display:'grid',
         gridTemplateColumns: isMobile ? 'repeat(2,1fr)' : 'repeat(3,1fr)',
         gap:14, maxWidth:640, margin:'0 auto' }}>
-        {PAYMENTS.map(({ name, color, bg, logo }) => (
-          <div key={name} className="lp-hover-lift"
-            style={{ padding:'18px 16px', borderRadius:18, background:bg,
-              border:`1px solid ${color}20`, textAlign:'center',
-              boxShadow:'0 2px 8px rgba(0,0,0,0.04)' }}>
-            <div style={{ fontSize:28, marginBottom:10 }}>{logo}</div>
-            <div style={{ fontSize:14, fontWeight:800, color }}>{name}</div>
+        {PAYMENTS.map(({ name, color, bg, logo, available }) => (
+          <div key={name} className={available ? 'lp-hover-lift' : ''}
+            style={{ padding:'18px 16px', borderRadius:18, position:'relative',
+              background: available ? bg : '#f8fafc',
+              border: available ? `1px solid ${color}20` : '1px solid #e2e8f0',
+              textAlign:'center', boxShadow: available ? '0 2px 8px rgba(0,0,0,0.04)' : 'none',
+              opacity: available ? 1 : 0.55 }}>
+            <div style={{ fontSize:28, marginBottom:10,
+              filter: available ? 'none' : 'grayscale(1)' }}>{logo}</div>
+            <div style={{ fontSize:14, fontWeight:800,
+              color: available ? color : '#94a3b8' }}>{name}</div>
+            {!available && (
+              <div style={{ marginTop:6, display:'inline-block', fontSize:10, fontWeight:800,
+                color:'#94a3b8', background:'#e2e8f0', borderRadius:999,
+                padding:'2px 8px', letterSpacing:0.5 }}>
+                Bientôt
+              </div>
+            )}
           </div>
         ))}
       </div>
