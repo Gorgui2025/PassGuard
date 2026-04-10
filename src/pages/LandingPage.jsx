@@ -462,7 +462,7 @@ export default function LandingPage() {
 
       <div style={{ display:'grid',
         gridTemplateColumns: isMobile ? '1fr' : isTablet ? '1fr 1fr' : 'repeat(4,1fr)',
-        gap: isMobile ? 16 : 20, alignItems:'start' }}>
+        gap: isMobile ? 16 : 20, alignItems:'stretch' }}>
         {PLANS.map(plan => {
           const displayPrice = plan.id === 'pro' && billingAnnual ? proAnnual
             : plan.id === 'famille' && billingAnnual ? famAnnual
@@ -474,7 +474,8 @@ export default function LandingPage() {
                 background: isColored ? plan.grad : 'white',
                 border: plan.popular ? 'none' : `1.5px solid ${plan.border || '#e2e8f0'}`,
                 boxShadow: plan.popular ? '0 20px 60px rgba(34,197,94,0.30)' : '0 4px 20px rgba(0,0,0,0.06)',
-                position:'relative', overflow:'hidden' }}>
+                position:'relative', overflow:'hidden',
+                display:'flex', flexDirection:'column' }}>
 
               {/* Badge populaire */}
               {plan.popular && (
@@ -485,7 +486,7 @@ export default function LandingPage() {
                 </div>
               )}
 
-              <div style={{ padding:'24px' }}>
+              <div style={{ padding:'24px', display:'flex', flexDirection:'column', flex:1 }}>
                 {/* Nom */}
                 <div style={{ fontSize:11, fontWeight:900, textTransform:'uppercase', letterSpacing:2,
                   color: isColored ? 'rgba(255,255,255,0.7)' : '#94a3b8', marginBottom:8 }}>
@@ -521,7 +522,7 @@ export default function LandingPage() {
                   margin:'18px 0' }}/>
 
                 {/* Features */}
-                <div style={{ display:'flex', flexDirection:'column', gap:10, marginBottom:24 }}>
+                <div style={{ display:'flex', flexDirection:'column', gap:10, marginBottom:24, flex:1 }}>
                   {plan.features.map(f => (
                     <div key={f} style={{ display:'flex', alignItems:'flex-start', gap:8 }}>
                       <CheckCircle2 size={15} color={ isColored ? 'rgba(255,255,255,0.85)' : '#16a34a' }
@@ -618,7 +619,8 @@ export default function LandingPage() {
           /* ── Cartes standard ── */
           return (
             <div key={name} className={available ? 'lp-hover-lift' : ''}
-              style={{ padding:'18px 16px', borderRadius:18, position:'relative',
+              style={{ height:160, borderRadius:18, position:'relative',
+                display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center',
                 background: available ? bg : '#f8fafc',
                 border: available ? `1px solid ${color}20` : '1px solid #e2e8f0',
                 textAlign:'center', boxShadow: available ? '0 2px 8px rgba(0,0,0,0.04)' : 'none',
