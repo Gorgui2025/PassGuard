@@ -9,7 +9,7 @@ import {
   TrendingUp, AlertTriangle, X
 } from 'lucide-react'
 
-const ADMIN_EMAIL = 'gorguindoye.2017@gmail.com'
+const ADMIN_EMAIL = 'ndoyegorgui41@gmail.com'
 
 const G  = 'linear-gradient(135deg,#22c55e,#15803d)'
 const GO = 'linear-gradient(135deg,#22c55e,#d97706)'
