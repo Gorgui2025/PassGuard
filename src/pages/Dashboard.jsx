@@ -56,7 +56,7 @@ const TIPS = [
   "Changez vos mots de passe tous les 3 à 6 mois.",
 ]
 
-const ADMIN_EMAIL = 'gorguindoye.2017@gmail.com'
+const ADMIN_EMAIL = 'ndoyegorgui41@gmail.com'
 
 export default function Dashboard() {
   const { user, logout, masterPassword } = useAuth()
