@@ -631,7 +631,7 @@ export default function LandingPage() {
                   {plan.id !== 'free' && (
                     <span style={{ fontSize:12, color: isColored ? 'rgba(255,255,255,0.7)' : '#94a3b8',
                       fontWeight:600, lineHeight:1.3 }}>
-                      FCFA<br/>/{billingAnnual ? 'mois' : 'mois'}
+                      FCFA<br/>/{plan.id === 'business' ? 'utilisateur/mois' : 'mois'}
                     </span>
                   )}
                 </div>
