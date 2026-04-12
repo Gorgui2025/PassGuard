@@ -102,7 +102,7 @@ const PLANS = [
 const PAYMENTS = [
   { name:'Wave',         color:'#2563eb', bg:'#eff6ff', logo:null, available:true  },
   { name:'Orange Money', color:'#ea580c', bg:'#fff7ed', logo:null, available:true  },
-  { name:'Free Money',   color:'#dc2626', bg:'#fef2f2', logo:'🔴', available:false },
+  { name:'Free Money',   color:'#dc2626', bg:'#fef2f2', logo:null,  available:false },
   { name:'MTN MoMo',     color:'#ca8a04', bg:'#fefce8', logo:'📱', available:false },
   { name:'Stripe',       color:'#6366f1', bg:'#eef2ff', logo:'💳', available:false },
   { name:'PayPal',       color:'#1d4ed8', bg:'#eff6ff', logo:'🅿️', available:false },
@@ -719,14 +719,20 @@ export default function LandingPage() {
         gridTemplateColumns: isMobile ? 'repeat(2,1fr)' : 'repeat(3,1fr)',
         gap:14, maxWidth:640, margin:'0 auto' }}>
         {PAYMENTS.map(({ name, color, bg, logo, available }) => {
-          /* ── Cartes avec image pleine (Wave & Orange Money) ── */
-          if (name === 'Wave' || name === 'Orange Money') {
-            const imgSrc    = name === 'Wave' ? '/image/wave.jpeg' : '/image/orange-money.jpeg'
-            const gradColor = name === 'Wave' ? 'rgba(21,112,239,0.85)' : 'rgba(234,88,12,0.85)'
-            const bdColor   = name === 'Wave' ? '#bfdbfe' : '#fed7aa'
-            const shadow    = name === 'Wave'
-              ? '0 4px 20px rgba(21,112,239,0.25)'
-              : '0 4px 20px rgba(234,88,12,0.25)'
+          /* ── Cartes avec image pleine (Wave, Orange Money & Free Money) ── */
+          if (name === 'Wave' || name === 'Orange Money' || name === 'Free Money') {
+            const imgSrc    = name === 'Wave' ? '/image/wave.jpeg'
+                            : name === 'Orange Money' ? '/image/orange-money.jpeg'
+                            : '/image/free-money.jpeg'
+            const gradColor = name === 'Wave' ? 'rgba(21,112,239,0.85)'
+                            : name === 'Orange Money' ? 'rgba(234,88,12,0.85)'
+                            : 'rgba(220,38,38,0.75)'
+            const bdColor   = name === 'Wave' ? '#bfdbfe'
+                            : name === 'Orange Money' ? '#fed7aa'
+                            : '#fecaca'
+            const shadow    = name === 'Wave' ? '0 4px 20px rgba(21,112,239,0.25)'
+                            : name === 'Orange Money' ? '0 4px 20px rgba(234,88,12,0.25)'
+                            : '0 4px 20px rgba(220,38,38,0.15)'
             return (
               <div key={name} className="lp-hover-lift"
                 style={{ borderRadius:18, overflow:'hidden', position:'relative',
@@ -740,6 +746,14 @@ export default function LandingPage() {
                   <span style={{ fontSize:15, fontWeight:900, color:'white',
                     textShadow:'0 1px 4px rgba(0,0,0,0.3)' }}>{name}</span>
                 </div>
+                {!available && (
+                  <div style={{ position:'absolute', top:8, right:8,
+                    fontSize:9, fontWeight:800, color:'#94a3b8',
+                    background:'rgba(255,255,255,0.90)', borderRadius:999,
+                    padding:'2px 7px', letterSpacing:0.5 }}>
+                    Bientôt
+                  </div>
+                )}
               </div>
             )
           }
